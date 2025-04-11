@@ -47,15 +47,17 @@ app.get("/tiere", (req, res) => {
 app.post("/tiere", (req, res) => {
   const { tierart, name, krankheit, age, gewicht } = req.body;
   db.run(
-    `INSERT INTO tiere (tierart,name,krankheit,age,gewicht) VALUES("Katze","Mimi","gesund",4,6.4)`
+    `INSERT INTO tiere (tierart,name,krankheit,age,gewicht) 
+        VALUES(?,?,?,?,?)`,
+    [tierart, name, krankheit, age, gewicht]
   );
   res.status(201).send("Tier wurde erfolgreich hinzugefügt");
 });
 
 app.get("/tiere/:id", (req, res) => {
   const id = req.params.id;
-  const selectTiereByQuery = "SELECT FROM  tiere  WHERE id = ?;";
-  db.get(selectTiereByQuery, [id], (err, row) => {
+  const selectTiereByQuery = "SELECT * FROM  tiere  WHERE id = ?";
+  db.get(selectTiereByQuery, [id], (err, rows) => {
     if (err) {
       res.status(404).send("Fehler in deiner Query Anfrage");
     } else {
@@ -63,14 +65,14 @@ app.get("/tiere/:id", (req, res) => {
     }
   });
 });
-
+// better than the command row 47
 app.post("/createNewTier", (req, res) => {
   const { tierart, name, krankheit, age, gewicht } = req.body;
   db.run(
     `INSERT INTO tiere (tierart,name,krankheit,age,gewicht) 
         VALUES(?,?,?,?,?)`,
     [tierart, name, krankheit, age, gewicht],
-    (err, row) => {
+    (err, rows) => {
       if (err) {
         res.status(404).send("Fehler in deiner Query Anfrage");
       } else {
@@ -78,6 +80,22 @@ app.post("/createNewTier", (req, res) => {
       }
     }
   );
+  res.status(201).send("Tier wurde erfolgreich hinzugefügt");
+});
+
+//app.put("/tiere/:id")
+
+app.delete("/tiere/:id", (req, res) => {
+    const id = req.params.id;
+    const selectTiereByQuery = "DELETE  FROM  tiere  WHERE id = ?";
+    db.get(selectTiereByQuery, [id], (err, rows) => {
+      if (err) {
+        res.status(404).send("Fehler in deiner Query Anfrage");
+      } else {
+        res.json(rows);
+      }
+    });
+  });
   res.status(201).send("Tier wurde erfolgreich hinzugefügt");
 });
 
